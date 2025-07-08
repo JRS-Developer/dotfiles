@@ -1,0 +1,6 @@
+0000000000000000000000000000000000000000 7d829d33ffa1846b3415a432e3ddc476c62f338e jose <jose@jose-B550M-DS3H-AC.(none)> 1726454810 -0400	clone: from github.com:JRS-Developer/nvim-config.git
+7d829d33ffa1846b3415a432e3ddc476c62f338e 8b8a60ebc624cb2407a8eaa1016c372c666d24ec Jose Sanchez <sanchezjoserafael25@gmail.com> 1733774703 -0400	commit: feat: removed import cost due to high cpu usage
+8b8a60ebc624cb2407a8eaa1016c372c666d24ec d26df154823a398c67e142ff67d57c0698020874 Jose Sanchez <sanchezjoserafael25@gmail.com> 1733939808 -0400	commit: fix: devicon config had broken icons
+d26df154823a398c67e142ff67d57c0698020874 d7198a3c5c18435713685286723fe19aa9fd8611 Jose Sanchez <sanchezjoserafael25@gmail.com> 1751402506 -0400	commit: chore: lot of changes
+d7198a3c5c18435713685286723fe19aa9fd8611 05f6f16a9a6c985b185182e2589788f9b4d16a40 Jose Sanchez <sanchezjoserafael25@gmail.com> 1751403594 -0400	commit: feat: removed ai extensions
+05f6f16a9a6c985b185182e2589788f9b4d16a40 8bb6e2807a9bcf9b19497ee27abbb2e04c70110c Jose Sanchez <sanchezjoserafael25@gmail.com> 1751900906 -0400	commit: fix: ipkg gone
