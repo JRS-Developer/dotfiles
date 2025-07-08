@@ -1,0 +1,14 @@
+allow_images=true
+image_size=24
+insensitive=true
+show=drun
+width=750
+always_parse_args=true
+show_all=false
+term=kitty
+hide_scroll=true
+print_command=true
+insensitive=true
+prompt=
+columns=2
+sort_order=alphabetical
