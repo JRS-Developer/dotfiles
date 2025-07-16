@@ -1,6 +1,36 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
+$accent_bg_color: #{"@theme_selected_bg_color"};
+$accent_fg_color: #{"@theme_selected_fg_color"};
+$success_bg_color: var(--success-bg-color);
+
+$box-radius: 8px;
+$transition-duration: 200ms;
+$popover-shade-color: var(--popover-shade-color);
+$window-side-margin: 18px;
+$window-vertical-margin: 20px;
+$shadow:
+  rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+  rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+
+button {
+  transition-duration: $transition-duration;
+
+  &.circular {
+    border-radius: 999px;
+  }
+
+  label {
+    color: $fg-color;
+  }
+}
+
+calendar.view {
+  .day-name {
+    text-transform: capitalize;
+  }
+}
 
 window.Bar {
   background: transparent;
@@ -9,21 +39,177 @@ window.Bar {
 
   > centerbox {
     background: $bg-color;
-    border-radius: 10px;
-    margin: 8px;
+    margin-top: $window-vertical-margin;
+    box-shadow: $shadow;
+    border-radius: $box-radius;
+    margin-left: $window-side-margin;
+    margin-right: $window-side-margin;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   button {
-    border-radius: 8px;
-    margin: 2px;
+    // border-radius: 8px;
+    border: none;
   }
+}
+
+.DashboardTab {
+  padding: 8px;
+}
+
+.DashboardTabHourAndMinute {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.DashboardTabDate {
+  color: $accent_bg_color;
+  font-weight: bolder;
+}
+
+.DashboardBox {
+  background-color: $popover-shade-color;
+
+  padding: 8px;
+  border-radius: $box-radius;
+  color: $accent_fg_color;
+
+  &.extraPadding {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  calendar.view {
+    background-color: transparent;
+    border: none;
+  }
+}
+
+.DashboardTabSysInfoLabel {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.WallpaperImgButtonContainer {
+  opacity: 0;
+  transition: opacity $transition-duration ease-in-out;
+  border-radius: 999px;
+}
+
+.WallpaperImgButtonContainer:hover {
+  opacity: 1;
+}
+
+.NotificationWindow {
+  background: transparent;
+  margin-right: $window-side-margin;
+  margin-top: 20px;
+}
+
+.NotificationWindowNotificationItem {
+  background: $bg-color;
+  padding: 8px 4px 8px 8px;
+  border-radius: $box-radius;
+}
+
+.NotificationWindowNotificationItemSummary {
+  font-weight: bold;
+  font-size: 20;
+}
+
+.MediaPlayerBars {
+  color: $accent_bg_color;
+}
+
+.MediaPlayerSongLabel {
+  color: $accent_bg_color;
+  font-weight: bold;
+}
+
+.EndeavourOsIcon {
+  color: #7e3ebe;
+}
+
+.HyprLandIcon {
+  color: #00e2d1;
+}
+
+.UptimeIcon {
+  color: $accent_bg_color;
+}
+
+.TrayRow {
+  background-color: $popover-shade-color;
+  border-radius: $box-radius;
+}
+
+.Workspaces {
+  background-color: $bg-color;
+  border-radius: $box-radius;
+}
+
+.WorkspaceItem {
+  &.group {
+    background-color: $popover-shade-color;
+    border-radius: 999px;
+  }
+}
+
+.WorkspaceClientItem {
+  border-radius: 999px;
+
+  &.focused {
+    background-color: $accent_bg_color;
+    border-radius: 999px;
+  }
+}
+
+.MainSearchWindow {
+  background-color: transparent;
+}
+
+.MainSearch {
+  background-color: $bg-color;
+  padding: 8px;
+  border-radius: $box-radius;
+  margin-bottom: $window-vertical-margin;
+  box-shadow: $shadow;
+  border: 2px solid $popover-shade-color;
+
+  &.hide {
+    margin-bottom: 0;
+  }
+
+  scrolledwindow {
+    background-color: $bg-color;
+  }
+
+  entry {
+    margin-top: 8px;
+  }
+
+  listview {
+    background-color: $bg-color;
+    border-radius: $box-radius;
+
+    row {
+      border-radius: 999px;
+      padding-left: 12px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
+}
+
+.ControlPanelBluetoothActive {
+  color: $success_bg_color;
 }
 
 .unstyledMenuButton {
   button {
     all: unset;
   }
-}
-
-.playerImage {
 }
