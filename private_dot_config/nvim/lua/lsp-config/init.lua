@@ -245,11 +245,15 @@ local lspconfig = require("lspconfig")
 
 masonLsp.setup({
 	ensure_installed = servers,
-  automatic_enable = false
+	automatic_enable = false,
 })
 
 for _, name in pairs(masonLsp.get_installed_servers()) do
-	local opts = {}
+	local opts = {
+		root_dir = vim.loop.cwd,
+		on_attach = M.on_attach,
+		capabilities = M.capabilities,
+	}
 
 	if name == "tailwindcss" then
 		opts.settings = {
@@ -276,6 +280,24 @@ for _, name in pairs(masonLsp.get_installed_servers()) do
 		}
 	end
 
+	if name == "stylelint_lsp" then
+		opts.filetypes = {
+			"css",
+			"scss",
+		}
+		opts.root_dir = require("lspconfig").util.root_pattern("package.json", ".git")
+	end
+
+	if name == "graphql" then
+		opts.filetypes = {
+			"graphql",
+			"typescriptreact",
+			"javascriptreact",
+			"typescript",
+			"javascript",
+		}
+	end
+
 	-- if name == "vtsls" then
 	-- 	opts.settings = {
 	-- 		typescript = {
@@ -299,10 +321,6 @@ for _, name in pairs(masonLsp.get_installed_servers()) do
 			},
 		}
 	end
-
-	opts.on_attach = M.on_attach
-	opts.capabilities = M.capabilities
-	opts.root_dir = vim.loop.cwd
 
 	lspconfig[name].setup(opts)
 end

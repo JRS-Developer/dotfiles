@@ -25,6 +25,7 @@ import { windowNames } from "../../constants/windows";
 const transitionDuration = 500;
 
 class MyListItem extends Gtk.ListItem {
+  _mainBox!: Gtk.Box;
   _textLabel!: Gtk.Label;
   _descLabel!: Gtk.Label;
   _image!: Gtk.Image;
@@ -90,18 +91,18 @@ const MainSearch = ({
   setListView,
   setSearchEntry,
   handleClose,
+
+  apps,
 }: {
   listView: Accessor<Gtk.ListView | undefined>;
   setListView: Setter<Gtk.ListView | undefined>;
   setSearchEntry: Setter<Gtk.SearchEntry | undefined>;
   handleClose: (immediate: boolean) => Promise<void>;
+  apps: AstalApps.Apps;
 }) => {
-  const apps = createAppsInstance({ variant: "appSearch" });
   const listStore = new Gio.ListStore();
   const model = new Gtk.SingleSelection({ model: listStore });
   const commands = getAllCommands();
-
-  let scrolledWindow: Gtk.ScrolledWindow | undefined;
 
   addAppsToListStore(listStore, getAllAppsForList(apps));
 
@@ -119,11 +120,7 @@ const MainSearch = ({
       vexpand
       hexpand
     >
-      <Gtk.ScrolledWindow
-        maxContentHeight={600}
-        propagateNaturalHeight
-        $={(s) => (scrolledWindow = s)}
-      >
+      <Gtk.ScrolledWindow maxContentHeight={600} propagateNaturalHeight>
         <Gtk.ListView
           vexpand
           $={(s) => {
@@ -165,6 +162,7 @@ const MainSearch = ({
                 listItem._textLabel = textLabel;
                 listItem._descLabel = descLabel;
                 listItem._image = image;
+                listItem._mainBox = mainBox;
 
                 rightBox.append(textLabel);
                 rightBox.append(descLabel);
@@ -278,6 +276,8 @@ const MainSearch = ({
 
 const MainSearchWindow = ({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) => {
   const { BOTTOM } = Astal.WindowAnchor;
+  const apps = createAppsInstance({ variant: "appSearch" });
+
   const { visible, setVisible } = MainSearchWindowContext.use();
 
   const hyprland = Hyprland.get_default();
@@ -340,6 +340,7 @@ const MainSearchWindow = ({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) => {
 
         if (visible) {
           searchEntry.get()?.grab_focus();
+          apps.reload(); // reload the list of apps in case of installed new app or similar
         }
 
         if (visible) {
@@ -399,6 +400,7 @@ const MainSearchWindow = ({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) => {
             setListView={setListView}
             setSearchEntry={setSearchEntry}
             handleClose={handleClose}
+            apps={apps}
           />
         </box>
       </Gtk.Revealer>

@@ -18,7 +18,7 @@ export const createAppsInstance = ({
   );
 };
 
-function simplifyAppName(appId: string): string {
+function simplifyAppName(appId: string = ""): string {
   const afterSlash = appId.split("/").pop() ?? appId;
   const afterDot = afterSlash.includes(".")
     ? afterSlash.split(".").pop()!

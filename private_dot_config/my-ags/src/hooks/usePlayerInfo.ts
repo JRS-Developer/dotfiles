@@ -7,6 +7,10 @@ import { Gtk } from "ags/gtk4";
 import { PlayerListItemObject } from "../objects/PlayerListItemObject";
 import { createAppsInstance, searchAppFromName } from "../utils/apps";
 
+// FIX: It always assign the first player as selected when changing of song because it's deleting the whole listStore and recreating it
+// causing it to select the first item of the list due to onNotifySelectedItem
+// so we need to use "player-selected" and "player-closed" events from mpris to update the list correctly
+
 const callbackIfCurrent = (
   callback: (changed: Mpris.Player) => void,
   getIsWantedPlayer: (player: Mpris.Player) => boolean,
@@ -87,6 +91,26 @@ const getters = {
   },
 };
 
+const addPlayerToListStore = (
+  listStore: Gio.ListStore,
+  apps: Apps.Apps,
+  p: Mpris.Player,
+) => {
+  const identity = p.get_identity();
+
+  if (!identity) return;
+
+  const app = searchAppFromName(apps, identity);
+  const icon = app?.[0]?.get_icon_name();
+
+  const item = new PlayerListItemObject({
+    text: identity,
+    desktopIcon: icon,
+    busName: p.get_bus_name(),
+  });
+  listStore.append(item);
+};
+
 const addPlayersToListStore = (
   listStore: Gio.ListStore,
   allPlayers: Accessor<Mpris.Player[]>,
@@ -104,19 +128,7 @@ const addPlayersToListStore = (
     }
 
     seen[key] = true;
-    const identity = p.get_identity();
-
-    if (!identity) return;
-
-    const app = searchAppFromName(apps, identity);
-    const icon = app?.[0]?.get_icon_name();
-
-    const item = new PlayerListItemObject({
-      text: identity,
-      desktopIcon: icon,
-      busName: p.get_bus_name(),
-    });
-    listStore.append(item);
+    addPlayerToListStore(listStore, apps, p);
   });
 };
 

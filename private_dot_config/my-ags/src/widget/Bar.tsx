@@ -2,7 +2,7 @@ import app from "ags/gtk4/app";
 import { createState, Accessor, Setter } from "ags";
 import { Astal, Gtk, Gdk } from "ags/gtk4";
 import { exec, execAsync } from "ags/process";
-import { createPoll, timeout } from "ags/time";
+import { createPoll } from "ags/time";
 import GLib from "gi://GLib";
 import MediaPlayer from "./MediaPlayer";
 import { useIsAnyPlayerPlaying } from "../hooks/useIsAnyPlayerPlaying";
@@ -19,6 +19,8 @@ import { windowNames } from "../constants/windows";
 import { formatKeyboard, getKeyboard } from "../utils/keyboard";
 import { findAvailableTerminal } from "../utils/apps";
 import ControlPanel from "./ControlPanel/ControlPanel";
+import { LogoutPanelWindowContext } from "../context/LogoutPanelWindowContext";
+import WindowOutsideRadius from "./WindowOutsideRadius";
 
 const dashboardBoxSpacing = spacing.normal;
 
@@ -92,10 +94,12 @@ const SystemProgressBarStat = ({
 }) => {
   return (
     <box orientation={Gtk.Orientation.VERTICAL} spacing={spacing.normal}>
-      <Gtk.ProgressBar
+      <Gtk.LevelBar
         orientation={Gtk.Orientation.VERTICAL}
         vexpand
-        fraction={fraction}
+        value={fraction}
+        maxValue={1}
+        minValue={0}
         inverted
       />
       <image iconName={iconName} />
@@ -301,25 +305,23 @@ const TimeRow = () => {
   );
 };
 
-export default function Bar({
-  gdkmonitor,
+const MainBar = ({
+  visible,
   index,
+  gdkmonitor,
   keyboard,
   setKeyboard,
 }: {
-  gdkmonitor: Gdk.Monitor;
+  visible: Accessor<boolean>;
   index: number;
+  gdkmonitor: Gdk.Monitor;
+
   keyboard: Accessor<string>;
   setKeyboard: Setter<string>;
-}) {
-  const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
-  // we need the timeout to set visible because doing it true by default causes
-  // the window to ignore the layer BOTTOM
-  const [visible, setVisible] = createState(false);
+}) => {
+  const { setVisible: setVisibleLogout } = LogoutPanelWindowContext.use();
 
-  timeout(0, () => {
-    setVisible(true);
-  });
+  const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
 
   return (
     <window
@@ -328,122 +330,125 @@ export default function Bar({
       class="Bar"
       gdkmonitor={gdkmonitor}
       exclusivity={Astal.Exclusivity.EXCLUSIVE}
-      layer={Astal.Layer.BOTTOM}
+      layer={Astal.Layer.TOP}
       anchor={TOP | LEFT | RIGHT}
       application={app}
     >
-      <centerbox cssName="centerbox">
-        <box $type="start">
-          <Workspaces gdkmonitor={gdkmonitor} index={index} />
-        </box>
-
-        <box $type="center">
-          <DashboardButton />
-        </box>
-
-        <box $type="end" spacing={spacing.large}>
-          <Tray />
-
-          <box spacing={spacing.small}>
-            <button
-              class="flat"
-              onClicked={async () => {
-                try {
-                  await execAsync("hyprctl switchxkblayout current next");
-                  setKeyboard(getKeyboard());
-                } catch (error) {
-                  printerr(error);
-                }
-              }}
-              tooltipText="Cambiar Teclado"
-            >
-              <label label={keyboard((v) => formatKeyboard(v))} />
-            </button>
-
-            <button
-              iconName="image-round-symbolic"
-              class="flat"
-              onClicked={() => {
-                changeMpvPaperImage("next");
-              }}
-              $={(s) => {
-                const gesture = Gtk.GestureClick.new();
-
-                gesture.set_button(3);
-
-                gesture.connect("released", () => {
-                  changeMpvPaperImage("prev");
-                });
-
-                s.add_controller(gesture);
-              }}
-              tooltipText="Cambiar fondo de pantalla"
-            />
-            <button
-              iconName="color-picker-symbolic"
-              class="flat"
-              onClicked={() => {
-                execAsync(
-                  "hyprpicker -a", // -a para copiar al portapapeles automáticamente
-                );
-              }}
-              tooltipText="Haz clic para elegir un color"
-            />
-            <button
-              iconName="clipboard-symbolic"
-              class="flat"
-              onClicked={() => {
-                const terminal = findAvailableTerminal();
-
-                if (!terminal) {
-                  printerr("NO terminal");
-                  return;
-                }
-
-                exec([terminal, "--class", "clipse", "-e", "clipse"]);
-              }}
-              tooltipText="Clipboard"
-            />
-
-            {/* <NotificationsPopover /> */}
+      <WindowOutsideRadius windowPosition="top">
+        <centerbox cssName="centerbox" hexpand>
+          <box $type="start">
+            <Workspaces gdkmonitor={gdkmonitor} index={index} />
           </box>
 
-          <TimeRow />
+          <box $type="center">
+            <DashboardButton />
+          </box>
 
-          <ControlPanel />
+          <box $type="end" spacing={spacing.large}>
+            <Tray />
 
-          <menubutton
-            iconName="system-shutdown"
-            class="destructive-action circular"
-          >
-            <popover>
-              <box
-                orientation={Gtk.Orientation.VERTICAL}
-                spacing={spacing.small}
+            <box spacing={spacing.small}>
+              <button
+                class="flat"
+                onClicked={async () => {
+                  try {
+                    await execAsync("hyprctl switchxkblayout current next");
+                    setKeyboard(getKeyboard());
+                  } catch (error) {
+                    printerr(error);
+                  }
+                }}
+                tooltipText="Cambiar Teclado"
               >
-                <button
-                  onClicked={() => {
-                    execAsync("loginctl lock-session");
-                  }}
-                >
-                  <box>
-                    <image iconName="system-lock-screen" />
-                    <label label="Lock" />
-                  </box>
-                </button>
+                <label label={keyboard((v) => formatKeyboard(v))} />
+              </button>
 
-                <button>
-                  <label label="⏻ Power Off" />
-                </button>
+              <button
+                iconName="image-round-symbolic"
+                class="flat"
+                onClicked={() => {
+                  changeMpvPaperImage("next");
+                }}
+                $={(s) => {
+                  const gesture = Gtk.GestureClick.new();
 
-                <button>
-                  <label label="🔄 Restart" />
-                </button>
-              </box>
-            </popover>
-          </menubutton>
-        </box>
-      </centerbox>
+                  gesture.set_button(3);
+
+                  gesture.connect("released", () => {
+                    changeMpvPaperImage("prev");
+                  });
+
+                  s.add_controller(gesture);
+                }}
+                tooltipText="Cambiar fondo de pantalla"
+              />
+              <button
+                iconName="color-picker-symbolic"
+                class="flat"
+                onClicked={() => {
+                  execAsync(
+                    "hyprpicker -a", // -a para copiar al portapapeles automáticamente
+                  );
+                }}
+                tooltipText="Haz clic para elegir un color"
+              />
+              <button
+                iconName="clipboard-symbolic"
+                class="flat"
+                onClicked={() => {
+                  const terminal = findAvailableTerminal();
+
+                  if (!terminal) {
+                    printerr("NO terminal");
+                    return;
+                  }
+
+                  exec([terminal, "--class", "clipse", "-e", "clipse"]);
+                }}
+                tooltipText="Clipboard"
+              />
+
+              {/* <NotificationsPopover /> */}
+            </box>
+
+            <TimeRow />
+
+            <ControlPanel />
+
+            <button
+              iconName="system-shutdown"
+              class="destructive-action circular"
+              onClicked={() => {
+                setVisibleLogout?.(true);
+              }}
+            />
+          </box>
+        </centerbox>
+      </WindowOutsideRadius>
     </window>
+  );
+};
+
+export default function Bar({
+  gdkmonitor,
+  index,
+  keyboard,
+  setKeyboard,
+  visible,
+}: {
+  gdkmonitor: Gdk.Monitor;
+  index: number;
+  keyboard: Accessor<string>;
+  setKeyboard: Setter<string>;
+  visible: Accessor<boolean>;
+}) {
+  return (
+    <MainBar
+      visible={visible}
+      index={index}
+      keyboard={keyboard}
+      setKeyboard={setKeyboard}
+      gdkmonitor={gdkmonitor}
+    />
   );
 }

@@ -38,6 +38,7 @@ const ClientItem = ({
   );
   return (
     <button
+      visible={title((v) => !!v)}
       class={className}
       tooltipText={title}
       onClicked={() => {
@@ -51,6 +52,7 @@ const ClientItem = ({
       <image
         iconName={isIcon ? found : undefined}
         visible={!!found}
+        pixelSize={20}
         file={isIcon ? undefined : found}
       />
     </button>
@@ -90,13 +92,15 @@ const WorkspaceItem = ({
   return (
     <box class={className}>
       <For each={clients}>
-        {(client) => (
-          <ClientItem
-            client={client}
-            focusedClient={focusedClient}
-            hasMoreClients={clients((c) => c.length > 1)}
-          />
-        )}
+        {(client) => {
+          return (
+            <ClientItem
+              client={client}
+              focusedClient={focusedClient}
+              hasMoreClients={clients((c) => c.length > 1)}
+            />
+          );
+        }}
       </For>
 
       <button

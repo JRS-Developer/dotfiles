@@ -6,10 +6,23 @@ import { MainSearchWindowContext } from "./src/context/MainSearchWindowContext";
 import { createState } from "ags";
 import { windowNames } from "./src/constants/windows";
 import { getKeyboard } from "./src/utils/keyboard";
-// import NotificationWindow from "./src/widget/Notifications/NotificationWindow";
+import LogoutPanelWindow from "./src/widget/LogoutPanel/LogoutPanelWindow";
+import { LogoutPanelWindowContext } from "./src/context/LogoutPanelWindowContext";
+import NotificationWindow from "./src/widget/Notifications/NotificationWindow";
+import { removeNotificationsFileList } from "./src/utils/notifications";
+import { timeout } from "ags/time";
+import SideBar from "./src/widget/SideBar";
 
 const [isVisibleMainSearch, setIsVisibleMainSearch] = createState(false);
+const [isVisibleLogoutWindow, setIsVisibleLogoutWindow] = createState(false);
 const [keyboard, setKeyboard] = createState(getKeyboard());
+// we need the timeout to set visible because doing it true by default causes
+// the window to ignore the layer BOTTOM
+const [visibleBars, setVisibleBars] = createState(false);
+
+timeout(1000, () => {
+  setVisibleBars(true);
+});
 
 app.start({
   css: style,
@@ -28,6 +41,8 @@ app.start({
     res("unknown command");
   },
   main() {
+    removeNotificationsFileList();
+
     app.get_monitors().map((monitor, i) => {
       return (
         <MainSearchWindowContext
@@ -36,26 +51,50 @@ app.start({
             setVisible: setIsVisibleMainSearch,
           }}
         >
-          {() => {
-            return (
-              <>
-                <Bar
-                  gdkmonitor={monitor}
-                  index={i}
-                  keyboard={keyboard}
-                  setKeyboard={setKeyboard}
-                />
-                <MainSearchWindow gdkmonitor={monitor} />
-                {/* <NotificationWindow gdkmonitor={monitor} /> */}
-              </>
-            );
-          }}
+          {() => (
+            <LogoutPanelWindowContext
+              value={{
+                visible: isVisibleLogoutWindow,
+                setVisible: setIsVisibleLogoutWindow,
+              }}
+            >
+              {() => {
+                return (
+                  <>
+                    <SideBar
+                      visible={visibleBars}
+                      gdkmonitor={monitor}
+                      position="left"
+                    />
+
+                    <SideBar
+                      visible={visibleBars}
+                      gdkmonitor={monitor}
+                      position="right"
+                    />
+                    <Bar
+                      visible={visibleBars}
+                      gdkmonitor={monitor}
+                      index={i}
+                      keyboard={keyboard}
+                      setKeyboard={setKeyboard}
+                    />
+
+                    <SideBar
+                      visible={visibleBars}
+                      gdkmonitor={monitor}
+                      position="bottom"
+                    />
+                    <MainSearchWindow gdkmonitor={monitor} />
+                    <LogoutPanelWindow gdkmonitor={monitor} />
+                    <NotificationWindow gdkmonitor={monitor} />
+                  </>
+                );
+              }}
+            </LogoutPanelWindowContext>
+          )}
         </MainSearchWindowContext>
       );
     });
-    // NotificationWindow causes a high cpu usge of 8% (the normal is 0.3%) when swaync is running
-    // so it's better to have this component done (and working perfectly) before replacing swaync
-    // (it has issues with receiving notifications, new notifications are not always added, the docs have an example so I might see that)
-    // app.get_monitors().map(NotificationWindow);
   },
 });

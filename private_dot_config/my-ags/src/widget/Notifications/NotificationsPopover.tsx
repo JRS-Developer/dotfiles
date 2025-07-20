@@ -6,7 +6,7 @@ import { Gtk } from "ags/gtk4";
 
 const NotificationsPopover = () => {
   const { notifications, dontDisturb } = useNotifications({
-    removeOnResolved: true,
+    removeOnExpiration: false,
   });
   const hasNotifications = notifications((v) => v.length > 0);
 

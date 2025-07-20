@@ -11,19 +11,9 @@ import { PlayerListItemObject } from "../objects/PlayerListItemObject";
 import CircularImage from "./CircularImage";
 import { spacing } from "../constants/theme/spacing";
 import { getIsIcon } from "../utils/icons";
+import { useControlledScale } from "../hooks/useControlledScale";
 
 // TODO: Add some way to update the volume by scrolling
-
-const getIsValidKeyForScale = (keyval: number): boolean => {
-  return [
-    Gdk.KEY_Right,
-    Gdk.KEY_Left,
-    Gdk.KEY_Page_Down,
-    Gdk.KEY_Page_Up,
-    Gdk.KEY_Home,
-    Gdk.KEY_End,
-  ].includes(keyval);
-};
 
 class ListItemWithImage extends Gtk.ListItem {
   _image!: Gtk.Image;
@@ -48,16 +38,6 @@ function matchClientToPlayer(
     ) ?? clients.find((c) => c.get_title().toLowerCase().includes(identity))
   );
 }
-
-const createPositionAdjustment = ({
-  length,
-  position,
-}: {
-  position: number | undefined;
-  length: number | undefined;
-}) => {
-  return Gtk.Adjustment.new(position ?? 0, 0, length || 1, 1, 1, 0);
-};
 
 const Select = ({
   allPlayers,
@@ -170,8 +150,6 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
     selectionModel,
   } = usePlayerInfo();
 
-  const [isSeeking, setIsSeeking] = createState<boolean>(false);
-
   const playBtnIcon = playbackStatus((playbackStatus) => {
     return playbackStatus === Mpris.PlaybackStatus.PLAYING
       ? "media-playback-pause"
@@ -188,12 +166,20 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
   const isSensitiveNext = canNext;
   const isSensitivePrev = canBack;
 
-  const [positionAdjustment, setPositionAdjustment] = createState(
-    createPositionAdjustment({
-      position: position.get(),
-      length: length.get(),
-    }),
-  );
+  const {
+    restartAdjustment,
+    setup,
+    state: { setIsSeeking },
+    adjustment,
+  } = useControlledScale({
+    value: position,
+    limit: length,
+    incrementer: 1,
+    updateValue: (v) => {
+      selectedPlayer.get()?.set_position(v);
+    },
+    variant: "seek",
+  });
 
   const cava = Cava.get_default();
   cava?.set_bars(48);
@@ -204,33 +190,6 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
     new Array(cava?.get_bars()).fill(0),
   );
 
-  const updateScale = (s: Gtk.Scale) => {
-    const adjustment = s.get_adjustment();
-    const v = adjustment.get_value();
-
-    selectedPlayer.get()?.set_position(v);
-    setIsSeeking(false);
-  };
-
-  const updateScaleSeekValue = () => {
-    setIsSeeking(true);
-  };
-
-  const lengthUnsubscribe = length.subscribe(() => {
-    if (positionAdjustment.get().get_upper() === length.get()) return;
-
-    positionAdjustment.get().set_upper(length.get() ?? 0);
-  });
-
-  const positionUnsubscribe = position.subscribe(() => {
-    if (isSeeking.get()) return;
-
-    const v = position.get();
-
-    if (v === positionAdjustment.get().get_value()) return;
-    positionAdjustment.get().set_value(v ?? 0);
-  });
-
   const convertUnsubscribe = coverArt.subscribe(() => {
     imgDrawingArea?.queue_draw();
   });
@@ -240,12 +199,10 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
     const position = selectedPlayer.get().get_position() ?? 0;
     // we need to restart the whole positionAdjustment to update the max length correctly when changing players
     // without this the upper or max value is not updated
-    setPositionAdjustment(
-      createPositionAdjustment({
-        position: position,
-        length: length,
-      }),
-    );
+    restartAdjustment({
+      value: position,
+      limit: length,
+    });
   });
 
   cava?.connect("notify::values", () => {
@@ -271,8 +228,6 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
   });
 
   onCleanup(() => {
-    lengthUnsubscribe();
-    positionUnsubscribe();
     convertUnsubscribe();
     selectedPlayerUnsubscribe();
   });
@@ -384,7 +339,7 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
           marginStart={16}
           marginEnd={16}
           sensitive={isSensitivePlayOrPause}
-          adjustment={positionAdjustment}
+          adjustment={adjustment}
           draw_value={false}
           // value changed
           onValueChanged={(s) => {
@@ -398,50 +353,7 @@ const MediaPlayer = ({ variant }: { variant: "complete" | "minimal" }) => {
             s.add_mark(max, Gtk.PositionType.RIGHT, formatSeconds(max));
           }}
           $={(s) => {
-            const keyController = Gtk.EventControllerKey.new();
-
-            // the click controller doesn't receive the released event due to a bug
-            // this fixes it: https://github.com/neithern/g4music/blob/master/src/ui/play-bar.vala#L167
-            let clickCOntroller: Gtk.GestureClick | undefined = undefined;
-
-            const controllers = s.observe_controllers();
-
-            for (var i = 0; i < controllers.get_n_items(); i++) {
-              var controller = controllers.get_item(i);
-              if (controller instanceof Gtk.GestureClick) {
-                clickCOntroller = controller;
-                break;
-              }
-            }
-
-            if (!clickCOntroller) {
-              clickCOntroller = new Gtk.GestureClick();
-              s.add_controller(clickCOntroller);
-            }
-
-            keyController.connect("key-pressed", (_, keyval) => {
-              if (!getIsValidKeyForScale(keyval)) return;
-
-              updateScaleSeekValue();
-            });
-
-            keyController.connect("key-released", (_, keyval) => {
-              if (!getIsValidKeyForScale(keyval)) return;
-
-              updateScale(s);
-            });
-
-            clickCOntroller.connect("pressed", () => {
-              updateScaleSeekValue();
-            });
-
-            clickCOntroller.connect("released", () => {
-              updateScale(s);
-            });
-
-            //  we don't add the click controller again because it's not needed
-            // s.add_controller(clickCOntroller);
-            s.add_controller(keyController);
+            setup(s);
           }}
         />
 

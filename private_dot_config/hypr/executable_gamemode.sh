@@ -9,6 +9,9 @@ if [ "$HYPRGAMEMODE" = 1 ] ; then
         keyword general:gaps_out 0;\
         keyword general:border_size 1;\
         keyword decoration:rounding 0"
+    killall mpvpaper
     exit
+else 
+    ~/.config/hypr/mpvpaper.sh
 fi
 hyprctl reload
