@@ -19,8 +19,8 @@ import { windowNames } from "../constants/windows";
 import { formatKeyboard, getKeyboard } from "../utils/keyboard";
 import { findAvailableTerminal } from "../utils/apps";
 import ControlPanel from "./ControlPanel/ControlPanel";
-import { LogoutPanelWindowContext } from "../context/LogoutPanelWindowContext";
 import WindowOutsideRadius from "./WindowOutsideRadius";
+import { useUptime } from "../hooks/useUptime";
 
 const dashboardBoxSpacing = spacing.normal;
 
@@ -133,7 +133,7 @@ const DashboardTab = () => {
   });
 
   const distro = getDistro();
-  const upTime = createPoll("time", 60000, "uptime -p");
+  const upTime = useUptime({ format: "complete" });
 
   const cpuUsage = useCpuUsage();
   const memoryUsage = useMemoryRamUsage();
@@ -256,14 +256,12 @@ const DashboardPopover = () => {
           <Gtk.StackPage
             name="child1"
             title="Dashboard"
-            // @ts-expect-error it works anyways
-            child={<DashboardTab />}
+            child={(<DashboardTab />) as unknown as Gtk.Widget}
           />
           <Gtk.StackPage
             name="child2"
             title="Media"
-            // @ts-expect-error it works anyways
-            child={<MediaTab />}
+            child={(<MediaTab />) as unknown as Gtk.Widget}
           />
         </Gtk.Stack>
       </box>
@@ -319,8 +317,6 @@ const MainBar = ({
   keyboard: Accessor<string>;
   setKeyboard: Setter<string>;
 }) => {
-  const { setVisible: setVisibleLogout } = LogoutPanelWindowContext.use();
-
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
 
   return (
@@ -415,13 +411,13 @@ const MainBar = ({
 
             <ControlPanel />
 
-            <button
-              iconName="system-shutdown"
-              class="destructive-action circular"
-              onClicked={() => {
-                setVisibleLogout?.(true);
-              }}
-            />
+            {/* <button */}
+            {/*   iconName="turn-off-symbolic" */}
+            {/*   class="destructive-action circular" */}
+            {/*   onClicked={() => { */}
+            {/*     setVisibleLogout?.(true); */}
+            {/*   }} */}
+            {/* /> */}
           </box>
         </centerbox>
       </WindowOutsideRadius>

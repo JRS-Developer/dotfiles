@@ -97,7 +97,6 @@ local mappings = {
 		nowait = true,
 		remap = false,
 	},
-	{ "<leader>t", "<cmd>ToggleTerm<cr>", desc = "ToggleTerm", nowait = true, remap = false },
 	{ "<leader>x", group = "Trouble", nowait = true, remap = false },
 	{
 		"<leader>xd",
@@ -119,7 +118,7 @@ local mappings = {
 	{ "<leader>xx", "<cmd>Trouble<cr>", desc = "Trouble", nowait = true, remap = false },
 
 	{ "<leader>g", group = "Git", nowait = true, remap = false },
-	{ "<leader>gg", "<cmd>lua _LAZYGIT_TOGGLE()<CR>", desc = "LazyGit", nowait = true, remap = false },
+	{ "<leader>gg", "<cmd>LazyGit<CR>", desc = "LazyGit", nowait = true, remap = false },
 	{ "<leader>gb", "<cmd>Gitsigns blame<CR>", desc = "Git Blame", nowait = true, remap = false },
 }
 

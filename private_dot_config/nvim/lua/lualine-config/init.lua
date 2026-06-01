@@ -62,8 +62,26 @@ require("lualine").setup({
 	sections = {
 		lualine_a = { "mode" },
 		lualine_b = { "branch", "diff", "diagnostics" },
-		lualine_c = { M, "filename" },
-		lualine_x = { "fileformat", "filetype" },
+		lualine_c = {
+			M,
+			"filename",
+			{
+				function()
+					local reg = vim.fn.reg_recording()
+					if reg ~= "" then
+						return "Recording @" .. reg
+					end
+					return ""
+				end,
+				color = { fg = "#e5c07b", gui = "bold" },
+			},
+		},
+		lualine_x = {
+			"lsp_status",
+			"copilot",
+			"fileformat",
+			"filetype",
+		},
 		lualine_y = { "progress" },
 		lualine_z = { "location" },
 	},
@@ -76,5 +94,5 @@ require("lualine").setup({
 		lualine_z = {},
 	},
 	tabline = {},
-	extensions = { "nvim-tree", "trouble", "mason", "toggleterm", "nvim-dap-ui" },
+	extensions = { "nvim-tree", "trouble", "mason", "toggleterm", "nvim-dap-ui", "avante", "fzf" },
 })

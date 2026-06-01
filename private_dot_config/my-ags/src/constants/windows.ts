@@ -5,3 +5,5 @@ export const windowNames = {
   NotificationWindow: "NotificationWindow",
   LogoutPanelWindow: "LogoutPanelWindow",
 };
+
+export const windowGapsOut = 15;

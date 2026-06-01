@@ -13,7 +13,7 @@ require("bufferline").setup({
 		end,
 	},
 
-	highlights = require("catppuccin.groups.integrations.bufferline").get(),
+	highlights = require("catppuccin.special.bufferline").get_theme(),
 })
 
 vim.api.nvim_set_keymap("n", "<A-1>", "<Cmd>BufferLineGoToBuffer 1<CR>", { noremap = true })

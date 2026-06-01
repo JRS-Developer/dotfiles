@@ -30,6 +30,9 @@ vim.o.clipboard = "unnamedplus" -- Allow copy/paste from other programs
 vim.o.termguicolors = true
 vim.o.completeopt = "menuone,noinsert,noselect"
 
+-- views can only be fully collapsed with the global statusline (suggested by Avante)
+vim.opt.laststatus = 3
+
 vim.opt.mouse = "a" -- Allow to use the mouse
 
 vim.o.foldmethod = "manual"

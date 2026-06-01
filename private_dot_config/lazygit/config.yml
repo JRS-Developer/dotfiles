@@ -1,12 +1,11 @@
 os:
   editPreset: 'nvim-remote'
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
 gui:
   nerdFontsVersion: "3"
-
 ## Catppuccin theme
 theme:
   activeBorderColor:

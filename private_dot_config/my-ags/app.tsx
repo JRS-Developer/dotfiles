@@ -61,17 +61,6 @@ app.start({
               {() => {
                 return (
                   <>
-                    <SideBar
-                      visible={visibleBars}
-                      gdkmonitor={monitor}
-                      position="left"
-                    />
-
-                    <SideBar
-                      visible={visibleBars}
-                      gdkmonitor={monitor}
-                      position="right"
-                    />
                     <Bar
                       visible={visibleBars}
                       gdkmonitor={monitor}
@@ -84,6 +73,18 @@ app.start({
                       visible={visibleBars}
                       gdkmonitor={monitor}
                       position="bottom"
+                    />
+
+                    <SideBar
+                      visible={visibleBars}
+                      gdkmonitor={monitor}
+                      position="left"
+                    />
+
+                    <SideBar
+                      visible={visibleBars}
+                      gdkmonitor={monitor}
+                      position="right"
                     />
                     <MainSearchWindow gdkmonitor={monitor} />
                     <LogoutPanelWindow gdkmonitor={monitor} />

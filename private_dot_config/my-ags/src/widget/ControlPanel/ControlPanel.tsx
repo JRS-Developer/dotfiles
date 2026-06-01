@@ -347,7 +347,7 @@ const SoundIcon = () => {
 
 const NotificationsIcon = ({ isOpened }: { isOpened: Accessor<boolean> }) => {
   const { notifications, dontDisturb } = useNotifications({
-    removeOnExpiration: false,
+    variant: "save-forever",
   });
 
   const hasNotifications = notifications((v) => {

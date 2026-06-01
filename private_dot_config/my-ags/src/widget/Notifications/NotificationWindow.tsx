@@ -12,7 +12,7 @@ const wantedWidth = 400;
 
 const NotificationWindow = ({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) => {
   const { TOP, RIGHT } = Astal.WindowAnchor;
-  const { notifications } = useNotifications({ removeOnExpiration: true });
+  const { notifications } = useNotifications({ variant: "temporal" });
 
   const hyprland = Hyprland.get_default();
 
@@ -41,7 +41,7 @@ const NotificationWindow = ({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) => {
         widthRequest={wantedWidth}
       >
         <For each={notifications}>
-          {(item) => <NotificationListItem item={item} />}
+          {(item) => <NotificationListItem item={item} variant="window" />}
         </For>
       </box>
     </window>

@@ -5,7 +5,13 @@ import Pango from "gi://Pango?version=1.0";
 import { spacing } from "../../constants/theme/spacing";
 import CircularImage from "../CircularImage";
 
-const NotificationListItem = ({ item }: { item: Notifd.Notification }) => {
+const NotificationListItem = ({
+  item,
+  variant,
+}: {
+  item: Notifd.Notification;
+  variant: "window" | "popover";
+}) => {
   const appIcon = createBinding(item, "appIcon");
   const desktopEntry = createBinding(item, "desktopEntry");
   const summary = createBinding(item, "summary");
@@ -20,7 +26,7 @@ const NotificationListItem = ({ item }: { item: Notifd.Notification }) => {
   return (
     <box
       spacing={spacing.normal}
-      class="NotificationWindowNotificationItem"
+      class={`NotificationItem ${variant === "window" ? "NotificationWindowNotificationItem" : ""} `}
       hexpand
       orientation={Gtk.Orientation.VERTICAL}
     >

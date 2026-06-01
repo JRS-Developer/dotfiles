@@ -4,3 +4,7 @@
 d26df154823a398c67e142ff67d57c0698020874 d7198a3c5c18435713685286723fe19aa9fd8611 Jose Sanchez <sanchezjoserafael25@gmail.com> 1751402506 -0400	commit: chore: lot of changes
 d7198a3c5c18435713685286723fe19aa9fd8611 05f6f16a9a6c985b185182e2589788f9b4d16a40 Jose Sanchez <sanchezjoserafael25@gmail.com> 1751403594 -0400	commit: feat: removed ai extensions
 05f6f16a9a6c985b185182e2589788f9b4d16a40 8bb6e2807a9bcf9b19497ee27abbb2e04c70110c Jose Sanchez <sanchezjoserafael25@gmail.com> 1751900906 -0400	commit: fix: ipkg gone
+8bb6e2807a9bcf9b19497ee27abbb2e04c70110c 3e15f0e93713d36c30bd8110951ce348d0233fa0 Jose Sanchez <sanchezjoserafael25@gmail.com> 1771282139 -0400	commit: chore: changes
+3e15f0e93713d36c30bd8110951ce348d0233fa0 5e0e1ec903b85a830221e404fbebce10c3a592de Jose Sanchez <sanchezjoserafael25@gmail.com> 1771765502 -0400	commit: feat: removed mcp hub and added github copilot
+5e0e1ec903b85a830221e404fbebce10c3a592de dc35f055f4668d1c5d686c27df69624e086c9462 Jose Sanchez <sanchezjoserafael25@gmail.com> 1772835151 -0400	commit: feat: eliminado algunas plugins que no uso
+dc35f055f4668d1c5d686c27df69624e086c9462 37cf9df15994a3d8d54e3543bc3ab149bfc41dcd Jose Sanchez <sanchezjoserafael25@gmail.com> 1772835739 -0400	commit: chore: removed unused plugins that were simply commented

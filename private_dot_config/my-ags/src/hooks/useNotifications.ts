@@ -3,9 +3,9 @@ import Notifd from "gi://AstalNotifd";
 import GLib from "gi://GLib";
 
 export const useNotifications = ({
-  removeOnExpiration,
+  variant,
 }: {
-  removeOnExpiration: boolean;
+  variant: "save-forever" | "temporal";
 }) => {
   const [notifications, setNotifications] = createState<Notifd.Notification[]>(
     [],
@@ -15,15 +15,26 @@ export const useNotifications = ({
   const ignoreTimeout = createBinding(notifd, "ignoreTimeout");
   const dontDisturb = createBinding(notifd, "dontDisturb");
 
+  const toggleDontDisturb = () => {
+    const v: boolean = notifd.dont_disturb;
+    notifd.set_dont_disturb(!v);
+  };
+
   const removeNotificationById = (id: number) => {
     setNotifications((prev) => {
       return prev.filter((n) => n.get_id() !== id);
     });
   };
 
+  const clearNotifications = () => {
+    notifd.get_notifications().forEach((n) => n.dismiss());
+  };
+
   notifd.connect("notified", (_source, id, replaced) => {
     const instance = Notifd.get_default();
     const notif = instance.get_notification(id);
+
+    if (notifd.get_dont_disturb() === true && variant === "temporal") return;
     if (!notif) return;
 
     setNotifications((prev) => {
@@ -36,7 +47,7 @@ export const useNotifications = ({
       return [notif, ...prev];
     });
 
-    if (removeOnExpiration && notif.get_expire_timeout() === -1) {
+    if (variant === "temporal" && notif.get_expire_timeout() === -1) {
       GLib.timeout_add(GLib.PRIORITY_DEFAULT, 30_000, () => {
         removeNotificationById(id);
         return GLib.SOURCE_REMOVE; // don't repeat
@@ -45,11 +56,17 @@ export const useNotifications = ({
   });
 
   notifd.connect("resolved", (_source, id, reason) => {
-    if (removeOnExpiration === false && reason === Notifd.ClosedReason.EXPIRED)
+    if (variant === "save-forever" && reason === Notifd.ClosedReason.EXPIRED)
       return;
 
     removeNotificationById(id);
   });
 
-  return { notifications, dontDisturb, ignoreTimeout };
+  return {
+    notifications,
+    dontDisturb,
+    ignoreTimeout,
+    clearNotifications,
+    toggleDontDisturb,
+  };
 };

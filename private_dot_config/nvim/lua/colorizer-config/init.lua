@@ -1,4 +1,4 @@
-require("colorizer").setup(nil, {
+require("colorizer").setup({
 
 	filetypes = { "*" },
 	user_default_options = {

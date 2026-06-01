@@ -10,7 +10,21 @@ $transition-duration: 200ms;
 $popover-shade-color: var(--popover-shade-color);
 $window-side-margin: 18px;
 $window-vertical-margin: 20px;
-$shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+$shadow-color: rgba(0, 0, 0, 0.35);
+// $shadow-color: red;
+$shadow: $shadow-color 0px 0px 8px 5px;
+
+$fake-radius: 12px;
+// These inset shadows fake a rounded look on the left and right sides.
+// - We use -5px spread to keep the shadow from being too wide (half of the outer 5px).
+// - The 10px X offset pushes the shadow just enough to touch the left or right edge.
+//   (Think of it like aiming a flashlight from inside the box toward one side only.)
+$fake-radius-inset-shadow-left: $shadow-color 10px 0px 8px -5px inset;
+// vertical-margin is to put the box that will hold shadow inside the window bar,this must be a number that allows to put inside and not cover the bar content
+$fake-radius-vertical-margin: -10px;
+// side margin must match the width of the bars on the left and right (the windowsGapOut variable)
+$fake-radius-side-margin: 15px;
+$fake-radius-inset-shadow-right: $shadow-color -10px 0px 8px -5px inset;
 
 button {
   transition-duration: $transition-duration;
@@ -21,6 +35,17 @@ button {
 
   label {
     color: $fg-color;
+  }
+}
+
+popover {
+  & > arrow {
+    all: unset;
+    display: none;
+  }
+
+  & > contents {
+    padding: 16px 10px;
   }
 }
 
@@ -60,38 +85,52 @@ window.Bar {
 
   & .Content {
     background-color: $bg-color;
+    box-shadow: $shadow;
   }
 }
 
 .TopWindowRadiusLeft {
   background-color: transparent;
-  border-top-left-radius: 20px;
-  box-shadow: -20px -10px 0 0px $bg-color;
-  margin-bottom: -10px;
+  border-top-left-radius: $fake-radius;
+
+  box-shadow:
+    -20px -8px 0 0px $bg-color,
+    $fake-radius-inset-shadow-left;
+  margin-bottom: $fake-radius-vertical-margin;
+  margin-left: $fake-radius-side-margin;
   border: none;
 }
 
 .TopWindowRadiusRight {
   background-color: transparent;
-  border-top-right-radius: 20px;
-  box-shadow: 20px -10px 0 0px $bg-color;
-  margin-bottom: -10px;
+  border-top-right-radius: $fake-radius;
+  box-shadow:
+    20px -8px 0 0px $bg-color,
+    $fake-radius-inset-shadow-right;
+  margin-bottom: $fake-radius-vertical-margin;
+  margin-right: $fake-radius-side-margin;
   border: none;
 }
 
 .BottomWindowRadiusLeft {
   background-color: transparent;
-  border-bottom-left-radius: 20px;
-  box-shadow: -20px 10px 0 0px $bg-color;
-  margin-top: -10px;
+  border-bottom-left-radius: $fake-radius;
+  box-shadow:
+    -20px 8px 0 0px $bg-color,
+    $fake-radius-inset-shadow-left;
+  margin-top: $fake-radius-vertical-margin;
+  margin-left: $fake-radius-side-margin;
   border: none;
 }
 
 .BottomWindowRadiusRight {
   background-color: transparent;
-  border-bottom-right-radius: 20px;
-  box-shadow: 20px 10px 0 0px $bg-color;
-  margin-top: -10px;
+  border-bottom-right-radius: $fake-radius;
+  box-shadow:
+    20px 8px 0 0px $bg-color,
+    $fake-radius-inset-shadow-right;
+  margin-top: $fake-radius-vertical-margin;
+  margin-right: $fake-radius-side-margin;
   border: none;
 }
 
@@ -148,10 +187,14 @@ window.Bar {
   margin-top: 20px;
 }
 
-.NotificationWindowNotificationItem {
+.NotificationItem {
   background: $bg-color;
   padding: 8px 4px 8px 8px;
   border-radius: $box-radius;
+}
+
+.NotificationWindowNotificationItem {
+  border: 1px solid $accent_bg_color;
 }
 
 .NotificationWindowNotificationItemSummary {

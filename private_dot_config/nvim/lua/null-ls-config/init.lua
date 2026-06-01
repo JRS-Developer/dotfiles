@@ -10,16 +10,12 @@ local sources = {
 		prefer_local = "node_modules/.bin",
 		extra_filetypes = { "prisma" },
 	}),
-	builtins.formatting.phpcbf, -- Php Code Sniffer Formatter
-	builtins.formatting.phpcsfixer, -- Php Code Sniffer Formatter (PHP-CS-Fixer)
 	builtins.formatting.clang_format,
-	null_ls.builtins.formatting.dart_format,
+	builtins.formatting.pint,
+	builtins.formatting.dart_format,
+	builtins.formatting.blade_formatter,
 
 	-- Diagnostics
-	builtins.diagnostics.phpcs, -- Php Code Sniffer Linter
-	builtins.diagnostics.phpmd.with({
-		extra_args = { "phpmd.xml" },
-	}), -- Php Mess Detector
 	-- builtins.diagnostics.pylama, -- Python linter, useful?
 	builtins.diagnostics.actionlint,
 	-- builtins.diagnostics.cpplint,
@@ -32,9 +28,4 @@ local sources = {
 
 null_ls.setup({
 	sources = sources,
-})
-
-require("mason-null-ls").setup({
-	ensure_installed = nil,
-	automatic_installation = true,
 })
