@@ -2,3 +2,6 @@
 **/@girs/
 **/@girs
 .config/nvim/lazy-lock.json
+.config/opencode/*.bak
+.config/opencode/*.backup-*
+.config/opencode/opencode-notifier-state.json
