@@ -1,0 +1,28 @@
+[user]
+	name = Jose Sanchez
+	email = sanchezjoserafael25@gmail.com
+[core]
+  editor = nvim
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only --diff-so-fancy
+
+[delta]
+    navigate = true    # use n and N to move between diff sections
+
+    # delta detects terminal colors automatically; set one of these to disable auto-detection
+    # dark = true
+    # light = true
+
+[merge]
+  conflictstyle = zdiff3
+
+[include]
+  path = .config/delta/themes/catppuccin.gitconfig
+
+[delta]
+  features = catppuccin-mocha
+  side-by-side = true
+[pull]
+	rebase = true
