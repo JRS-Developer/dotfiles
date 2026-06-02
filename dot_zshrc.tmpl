@@ -1,16 +1,16 @@
-# OPENSPEC:START
-# OpenSpec shell completions configuration
-fpath=("/home/jose/.oh-my-zsh/custom/completions" $fpath)
-autoload -Uz compinit
-compinit
-# OPENSPEC:END
-
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+# OPENSPEC:START
+# OpenSpec shell completions configuration
+fpath=("/home/jose/.oh-my-zsh/custom/completions" $fpath)
+autoload -Uz compinit
+compinit -i
+# OPENSPEC:END
 
 
 export NVM_DIR="$HOME/.nvm"
@@ -156,10 +156,13 @@ export PHP_INI_SCAN_DIR="/home/jose/.config/herd-lite/bin:$PHP_INI_SCAN_DIR"
 export PATH=/home/jose/.opencode/bin:$PATH
 
 
-# Load Angular CLI autocompletion.
-source <(ng completion script)
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
+
+# Load Angular CLI autocompletion.
+if command -v ng &> /dev/null; then
+  source <(ng completion script)
+fi
 
 # bun completions
 [ -s "/home/jose/.oh-my-zsh/completions/_bun" ] && source "/home/jose/.oh-my-zsh/completions/_bun"
